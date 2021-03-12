@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np 
 import os
 from env import host, user, password 
-
+from sklearn.model_selection import train_test_split
 
 
 #all reproducable functions used
@@ -35,8 +35,10 @@ def clean_telco(df):
     as well as dropping cutomer_id and contract_type_id columns from the dataframe
     return: df, a cleaned pandas dataframe
     '''
-    df['total_charges'] = pd.to_numeric(df.total_charges, errors='coerce')
-    df = df.drop(columns=['customer_id', 'contract_type_id'])
+    df.total_charges = df.total_charges.replace(r'^\s*$', np.nan, regex=True)
+    df = df.fillna(0)
+    df['total_charges'] = df['total_charges'].astype('float')
+    df = df.drop(columns=['contract_type_id'])
     return df
 
 
@@ -46,8 +48,8 @@ def split_data(df):
     takes in a pandas dataframe
     returns: three pandas dataframes, train, test, and validate
     '''
-    train_val, test = train_test_split(df, train_size=0.8, random_state=1349, stratify=df.total_charges)
-    train, validate = train_test_split(train_val, train_size=0.7, random_state=1349, stratify=train_val.total_charges)
+    train_val, test = train_test_split(df, train_size=0.8, random_state=123)
+    train, validate = train_test_split(train_val, train_size=0.7, random_state=123)
     return train, validate, test
 
 #wrangle: acquire and prep data set
@@ -61,4 +63,5 @@ def wrangle_telco():
     
     '''
     df = clean_telco(acquire_telco())
+
     return split_data(df)
