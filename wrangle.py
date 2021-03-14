@@ -39,6 +39,7 @@ def clean_telco(df):
     df = df.fillna(0)
     df['total_charges'] = df['total_charges'].astype('float')
     df = df.drop(columns=['contract_type_id'])
+    df = df.set_index('customer_id')
     return df
 
 
